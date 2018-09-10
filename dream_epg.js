@@ -44,7 +44,7 @@ var dream_epg=function(){
 	var urlepeg=gethelper+ip+"/web/epgservice?sRef=";//1:0:1:D175:2718:F001:FFFF0000:0:0:0:
 	var urlstream=ip+"/web/stream.m3u?ref=";
 	
-	var zielid="epegcontainer";
+	var zielid="epgcontainer";
 	
 	var senderdata=[];//."e2servicereference": ,."e2servicename":
 				
