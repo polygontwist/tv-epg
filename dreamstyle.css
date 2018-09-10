@@ -1,0 +1,110 @@
+*{
+	box-sizing: border-box;
+}
+
+body{
+	background-color:#5D5D5D;
+	color: #ffffff;
+	font-family: Helvetica,sans-serif;
+	font-size: 11pt;
+}
+
+
+#epegcontainer tr{
+}
+
+#epegcontainer th,#epegcontainer th a,
+#epegcontainer td,
+#epegcontainer td ul,#epegcontainer td li{
+	height:42px;
+}
+
+
+#epegcontainer th{
+	width:150px;
+	text-align: center;
+    display: inline-block;
+    color: #e2e2e2;
+    font-size: 11pt;
+    text-decoration: none;
+    overflow:hidden;
+    padding:0;
+    position:relative;
+    float:left;
+    background:  -moz-linear-gradient(top, #656565, #4b4b4b);
+    background:  -webkit-gradient(linear, left top, left bottom, from(#656565), to(#4b4b4b));
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#656565',  endColorstr='#4b4b4b');
+}
+#epegcontainer th a{
+	width:150px;
+	display:inline-block;
+	color: #e2e2e2;
+	font-size: 11pt;
+	text-decoration: none;
+	font-weight:normal;
+	background-repeat:no-repeat;
+	background-position:center center;
+}
+
+.hatbgimg{color:transparent !important;}
+
+#epegcontainer td{
+	white-space: nowrap;
+	padding:0;
+}
+#epegcontainer td ul{
+	white-space: nowrap;
+	margin:0;
+	padding:0;
+}
+#epegcontainer td li{
+	background-color:#ddd;
+	color: #e2e2e2;
+	white-space: nowrap;
+	/*border: 1px solid #000;*/
+	border-right: 1px solid #525252;
+	display: inline-block;
+	font-family: sans-serif; 
+	font-size: 10pt;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top:3px;
+	background:  -moz-linear-gradient(top, #4b4b4b, #656565);
+	background:  -webkit-gradient(linear, left top, left bottom, from(#4b4b4b), to(#656565));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#4b4b4b',  endColorstr='#656565');	
+} 
+#epegcontainer td li.hgtrans{
+	background:transparent;
+	border:0;
+}
+
+
+#epegcontainer td li h4{
+	margin:0;
+	font-weight:normal;
+}
+
+#epegcontainer td li p{
+	margin:0;
+}
+
+.buttreload{
+	margin-left: 10px;
+	color: #000;
+	text-decoration: none;
+	border-radius: 15px;
+	padding: 4px 10px;
+	background-color: #fffc;
+}
+
+.maker{
+	background-color: #e2e2e2;
+	color: #525252;
+	padding-right: 3px;
+	padding-left: 3px;
+	border-radius: 4px 4px 4px 4px;
+}
+
+.ausgeblendet{
+	display: none !important;
+}
