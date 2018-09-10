@@ -39,7 +39,7 @@
 
 var dream_epg=function(){
 	var gethelper="get.php?url=";
-	var ip="http://192.168.0.10";
+	var ip="http://192.168.0.10";//IP von Dreambox
 	var urlsender=gethelper+ip+"/web/getservices?sRef=1:7:1:0:0:0:0:0:0:0:FROM%2520BOUQUET%2520%2522userbouquet.favourites.tv%2522%2520ORDER%2520BY%2520bouquet";
 	var urlepeg=gethelper+ip+"/web/epgservice?sRef=";//1:0:1:D175:2718:F001:FFFF0000:0:0:0:
 	var urlstream=ip+"/web/stream.m3u?ref=";
@@ -48,7 +48,6 @@ var dream_epg=function(){
 	
 	var senderdata=[];//."e2servicereference": ,."e2servicename":
 				
-
 	var namensfilter=["/","_","-","sanhalt",".","&amp;"];
 	
 	var makerliste=[
@@ -151,6 +150,8 @@ var dream_epg=function(){
 		{"m":"Voyager","s":"syfy"}
 	];
 	
+	var zeigeZeitabH=-1;
+	var zeigeZeitabM=0;
 	
 	//helper
 	
@@ -252,6 +253,24 @@ var dream_epg=function(){
 		var re=""+zahl,i,rel=re.length;
 		for(i=0;i<anzahl-rel;i++){
 			re="0"+re;
+		}
+		return re;
+	}
+	
+	var getNodesByData=function(Dataname,liste){//<div data-name=""></div>
+		var i,t,htmlNode,re=[],rre=[];
+		if(liste==undefined)liste=document.getElementsByTagName('body')[0].childNodes;
+		for(i=0;i<liste.length;i++){
+			htmlNode=liste[i];
+			if(typeof htmlNode.getAttribute==='function')
+				if(htmlNode.getAttribute(Dataname)!=undefined)re.push(htmlNode);
+ 
+			if(htmlNode.childNodes.length>0){
+				rre=getNodesByData(Dataname,htmlNode.childNodes);
+				for(t=0;t<rre.length;t++){
+					re.push(rre[t]);
+				}
+			}
 		}
 		return re;
 	}
@@ -438,7 +457,11 @@ var dream_epg=function(){
 		
 	}
 	
-	/*
+	var setJetzt=function(hh,mm){
+		zeigeZeitabH=hh;
+		zeigeZeitabM=mm;
+	}
+	
 	var getJetzt=function(){
 		var jetzt = new Date();
 		var jStd = jetzt.getHours();
@@ -455,11 +478,9 @@ var dream_epg=function(){
 						jMin,
 						0,0
 				);
-		
-		//console.log(testdate.toUTCString(),testdate,testdate.getTimezoneOffset());
-		return testdate.getTime();
+		return testdate;
 	}
-	*/
+	
 	
 	var epegloader=function(node,senderdata){
 		var _this=this;
@@ -469,6 +490,14 @@ var dream_epg=function(){
 		
 		var reloaddata=function(e){
 			loader.reload();
+			e.preventDefault();
+		}
+		
+		var sendungklick=function (e){
+			if(istClass(this,"sendungSelect"))
+				subClass(this,"sendungSelect")
+				else
+				addClass(this,"sendungSelect");
 			e.preventDefault();
 		}
 		
@@ -517,15 +546,39 @@ var dream_epg=function(){
 			//e2eventdescription: "Schöpferinnen von Kunst in Stein"
 			//e2eventdescriptionextended: "...."
 
+			li.addEventListener('click',sendungklick);
+			
 			return li;
 		}
 		
 		var zeitchecken=function(){
+			var i,o,dtime;
 			//TODO: +alternativzeit
 			//checken ob nodes ausgeblendet werden sollen
-			console.log("checktime",senderdata.e2servicename,sendungen);
+			//console.log("checktime",senderdata.e2servicename,sendungen);
 			
-			//sendungen[] ...
+			var jetzt=getJetzt();
+			var zeitdiff=jetzt.getHours()-jetzt.getUTCHours();
+			var isset=false;
+			for(i=0;i<sendungen.length;i++){
+				o=sendungen[i];
+				//o.starttime.pdate
+				dtime=o.starttime.pdate;//date-object
+					
+				if(
+					dtime.getTime()>=(jetzt.getTime() - zeitdiff*60*60*1000)  //jetzt 
+					&&
+					dtime.getTime()<(jetzt.getTime()+(24+zeitdiff)*60*60*1000) //jetzt +24h
+				){
+					subClass(o.node,"ausgeblendet");
+					if(!isset && i>0)subClass(sendungen[i-1].node,"ausgeblendet");
+					isset=true;
+				}
+				else{
+					
+					addClass(o.node,"ausgeblendet");
+				}
+			}
 			
 		}
 		
@@ -569,7 +622,7 @@ var dream_epg=function(){
 				
 				
 				if(
-					dtime.getTime()>(heute.getTime() - zeitdiff*60*60*1000)  //jetzt 
+					dtime.getTime()>=(heute.getTime() - zeitdiff*60*60*1000)  //jetzt 
 					&&
 					dtime.getTime()<(heute.getTime()+(24+zeitdiff)*60*60*1000) //jetzt +24h
 				)
@@ -626,11 +679,11 @@ var dream_epg=function(){
 	}
 	
 	var timerid;
-	var startzeitchecker=function(){
+	var zeitchecker=function(){
 		var i;
 		if(timerid!=undefined)clearTimeout(timerid);
 		
-		console.log("startzeitchecker",senderdata);
+		//console.log("zeitchecker",senderdata);
 		
 		for(i=0;i<senderdata.length;i++){
 			if(senderdata[i].epegloader!=undefined){
@@ -656,7 +709,7 @@ var dream_epg=function(){
 		//		.pdate of Date()	-UTC
 		//		)
 		
-		timerid=setTimeout(function(){startzeitchecker()}, 30000);//30sec
+		timerid=setTimeout(function(){zeitchecker()}, 30000);//30sec
 	}
 	
 	
@@ -695,12 +748,44 @@ var dream_epg=function(){
 		//2x 45.92sec
 		//loadepegdata();
 		loadepegdata();
-		startzeitchecker();
+		zeitchecker();
 	}
 	
+	var oldzeigeButt=undefined;		
+	var zeigeZeitAbClick=function (e){
+		var z=this.getAttribute('data-tvzeit').split(':');
+		var zh=Number(z[0]);
+		var zm=Number(z[1]);
+		if(zeigeZeitabH!=zh){
+				if(oldzeigeButt!=undefined){
+				  subClass(oldzeigeButt,'buttaktiv');
+				}		
+				addClass(this,'buttaktiv');
+				zeigeZeitabH=zh;
+				zeigeZeitabM=zm;
+				oldzeigeButt=this;
+			}
+			else{
+				subClass(this,'buttaktiv');
+				zeigeZeitabH=-1;
+				zeigeZeitabM=0;
+				oldzeigeButt=undefined;
+			}		
+		zeitchecker();
+		e.preventDefault();
+	}
+	
+	var initButtons=function(){
+		var i,liste=getNodesByData('data-tvzeit',undefined);
+		for(i=0;i<liste.length;i++){
+			liste[i].addEventListener('click',zeigeZeitAbClick);
+		}
+	}
 	
 	var ini=function(){
 		new htmlloader(urlsender,parsesenderliste,function(e){console.log("ERR",e);});
+		
+		initButtons();
 		
 	}
 	
