@@ -481,6 +481,21 @@ var dream_epg=function(){
 		return testdate;
 	}
 	
+	var filtertext=function(s){
+		var re="",i,c;
+		for(i=0;i<s.length;i++){//C2(194) 8A(138)
+			c=s.charCodeAt(i);
+			if(c==138)
+				re+=" ";
+				else
+			if(c>=32)
+				re+=s.charAt(i);
+			else
+				console.log(c,s.charAt(i));
+		}
+		
+		return re;
+	}
 	
 	var epegloader=function(node,senderdata){
 		var _this=this;
@@ -526,7 +541,7 @@ var dream_epg=function(){
 			if(ismaker(data))addClass(sp,"maker");
 				
 			if(data.e2eventdescriptionextended!=undefined)
-				li.title= data.e2eventdescriptionextended;
+				li.title=filtertext(data.e2eventdescriptionextended);
 			
 			n=cE(li,"p");
 			if(data.e2eventdescription!=undefined)

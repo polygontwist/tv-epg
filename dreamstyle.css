@@ -10,6 +10,9 @@ body{
 }
 
 
+#epgcontainer table{
+	border-collapse: collapse;
+}
 #epgcontainer tr{
 }
 
@@ -94,6 +97,7 @@ body{
 
 #epgcontainer td li p{
 	margin:0;
+	font-size: 8pt;
 }
 
 .buttreload{
