@@ -551,6 +551,7 @@ var dream_epg=function(){
 			
 			data.node=li;			
 			
+			//data.
 			//e2eventduration: 		"3300" 				Dauer in Sekunden
 			//e2eventstart: 		"1536500100"		UNIX-Zeitstempel
 			//e2eventcurrenttime: 	"1536503003"		UNIX-Zeitstempel 
@@ -562,6 +563,8 @@ var dream_epg=function(){
 			//e2eventdescriptionextended: "...."
 
 			li.addEventListener('click',sendungklick);
+			li.setAttribute('date',zeigetime.toString());
+			li.setAttribute('duration',data.e2eventduration);
 			
 			return li;
 		}
