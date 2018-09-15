@@ -41,7 +41,7 @@ var dream_epg=function(){
 	var gethelper="get.php?url=";
 	var ip="http://192.168.0.10";//IP von Dreambox
 	var urlsender=gethelper+ip+"/web/getservices?sRef=1:7:1:0:0:0:0:0:0:0:FROM%2520BOUQUET%2520%2522userbouquet.favourites.tv%2522%2520ORDER%2520BY%2520bouquet";
-	var urlepeg=gethelper+ip+"/web/epgservice?sRef=";//1:0:1:D175:2718:F001:FFFF0000:0:0:0:
+	var urlepg="getepg.php?url="+ip+"/web/epgservice?sRef=";//1:0:1:D175:2718:F001:FFFF0000:0:0:0:
 	var urlstream=ip+"/web/stream.m3u?ref=";
 	
 	var zielid="epgcontainer";
@@ -499,7 +499,7 @@ var dream_epg=function(){
 	
 	var epegloader=function(node,senderdata){
 		var _this=this;
-		var url=urlepeg+senderdata.e2servicereference;
+		var url=urlepg+senderdata.e2servicereference;
 		var loader;
 		var sendungen=[];
 		
