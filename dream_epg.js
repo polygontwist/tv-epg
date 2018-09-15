@@ -1,6 +1,6 @@
 "use strict";
 
-//TODO: Zeitwahlbutton
+
 
 
 //https://dream.reichholf.net/e2web/#epgservice
@@ -581,7 +581,7 @@ var dream_epg=function(){
 				dtime=o.starttime.pdate;//date-object
 					
 				if(
-					dtime.getTime()>=(jetzt.getTime() - zeitdiff*60*60*1000)  //jetzt 
+					dtime.getTime()>(jetzt.getTime() - zeitdiff*60*60*1000)  //jetzt 
 					&&
 					dtime.getTime()<(jetzt.getTime()+(24+zeitdiff)*60*60*1000) //jetzt +24h
 				){
