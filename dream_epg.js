@@ -38,11 +38,13 @@
 
 
 var dream_epg=function(){
-	var gethelper="get.php?url=";
 	var ip="http://192.168.0.10";//IP von Dreambox
+	var urlstream=ip+"/web/stream.m3u?ref=";
+	
+	var gethelper="get.php?url=";
 	var urlsender=gethelper+ip+"/web/getservices?sRef=1:7:1:0:0:0:0:0:0:0:FROM%2520BOUQUET%2520%2522userbouquet.favourites.tv%2522%2520ORDER%2520BY%2520bouquet";
 	var urlepg="getepg.php?url="+ip+"/web/epgservice?sRef=";//1:0:1:D175:2718:F001:FFFF0000:0:0:0:
-	var urlstream=ip+"/web/stream.m3u?ref=";
+	var senderbilder="pic/";
 	
 	var zielid="epgcontainer";
 	
@@ -173,9 +175,13 @@ var dream_epg=function(){
 				}
 			}
 		}
-		var startloading=function(){
+		var startloading=function(isreload){
 			if(loader!=null){
-				loader.open('GET',url,true);//open(method, url, async, user, password)
+				var u=url;
+				if(isreload){
+					u+='&reload=true';
+				}
+				loader.open('GET',u,true);//open(method, url, async, user, password)
 				loader.responseType='text'; //!                
 				loader.setRequestHeader('Content-Type', 'text/plain'); 
 				loader.setRequestHeader('Cache-Control', 'no-cache'); 
@@ -199,10 +205,10 @@ var dream_epg=function(){
 		}
 		//--API--
 		this.reload=function(){
-			startloading();
+			startloading(true);
 		}
  
-		startloading();
+		startloading(false);
 	}
 
 	var cE=function(ziel,e,id,cn){
@@ -256,6 +262,30 @@ var dream_epg=function(){
 		}
 		return re;
 	}
+	var parseJSON=function(s){
+		var re={};
+		if(s=="undefined")s="{}";
+		if(s==undefined)s="{}";
+		if(s==null)s="{}";
+		s=s.split("\n").join('').split("\r").join('').split("\t").join('');	
+		s=s.split("'").join('"');	//passend formatieren ' -> "
+		try{
+			re=JSON.parse(s);
+		}
+		catch(err) {
+			console.log("JSONfehler",err.message,{"s":s});
+			re={};
+		}
+		return re;
+	}
+	var JSONistemty=function(obj){
+		for(var key in obj){
+			return false; // not empty
+		}
+		return true; // empty
+	}
+
+
 	
 	var getNodesByData=function(Dataname,liste){//<div data-name=""></div>
 		var i,t,htmlNode,re=[],rre=[];
@@ -587,9 +617,11 @@ var dream_epg=function(){
 					dtime.getTime()>(jetzt.getTime() - zeitdiff*60*60*1000)  //jetzt 
 					&&
 					dtime.getTime()<(jetzt.getTime()+(24+zeitdiff)*60*60*1000) //jetzt +24h
+					
+					||i==(sendungen.length-1)
 				){
 					subClass(o.node,"ausgeblendet");
-					if(!isset && i>0)subClass(sendungen[i-1].node,"ausgeblendet");
+					if(!isset && i>0 && i!=(sendungen.length-1))subClass(sendungen[i-1].node,"ausgeblendet");
 					isset=true;
 				}
 				else{
@@ -630,6 +662,7 @@ var dream_epg=function(){
 			ul=cE(node,"ul");
 			var anz=sendungen.length;
 			var isadd=false;
+			var anzahlsichtbar=0;
 			for(i=0;i<anz;i++){//
 				o=sendungen[i];
 				o.starttime=UnixzeitToUTC(o.e2eventstart);
@@ -642,16 +675,19 @@ var dream_epg=function(){
 				if(
 					dtime.getTime()>=(heute.getTime() - zeitdiff*60*60*1000)  //jetzt 
 					&&
-					dtime.getTime()<(heute.getTime()+(24+zeitdiff)*60*60*1000) //jetzt +24h
+					dtime.getTime()<(heute.getTime()+(48+zeitdiff)*60*60*1000) //jetzt +24h
+					
+					||i==anz-1
 				)
 				{
-					if(!isadd && i>0){//aktuelleSendung
+					if(!isadd && i>0 && i!=(anz-1)){//aktuelleSendung
 						li=sendungen[i-1].node;
 						subClass(li,"ausgeblendet");
 					}
 										
 					li=createHTML(o,ul);
 					isadd=true;
+					anzahlsichtbar++;
 				}
 				else{
 					li=createHTML(o,ul);
@@ -659,7 +695,7 @@ var dream_epg=function(){
 				}
 				
 			}
-			if(sendungen.length<10){
+			if(sendungen.length<10 || anzahlsichtbar<3){
 				if(sendungen.length<1){
 						node.innerHTML="keine Sendungen gefunden";
 						n=cE(node,"a");
@@ -750,7 +786,7 @@ var dream_epg=function(){
 			a.innerHTML=o.e2servicename;
 			a.addEventListener("click",openstream);
 						
-			new bildchecker(a,"pic/"+getName(o.e2servicename)+".png");
+			new bildchecker(a,senderbilder+getName(o.e2servicename)+".png");
 			
 			td=cE(tr,"td");
 			td.innerHTML="load...";
@@ -776,15 +812,15 @@ var dream_epg=function(){
 		var zm=Number(z[1]);
 		if(zeigeZeitabH!=zh){
 				if(oldzeigeButt!=undefined){
-				  subClass(oldzeigeButt,'buttaktiv');
+				  subClass(oldzeigeButt,'epgbuttaktiv');
 				}		
-				addClass(this,'buttaktiv');
+				addClass(this,'epgbuttaktiv');
 				zeigeZeitabH=zh;
 				zeigeZeitabM=zm;
 				oldzeigeButt=this;
 			}
 			else{
-				subClass(this,'buttaktiv');
+				subClass(this,'epgbuttaktiv');
 				zeigeZeitabH=-1;
 				zeigeZeitabM=0;
 				oldzeigeButt=undefined;
@@ -801,6 +837,20 @@ var dream_epg=function(){
 	}
 	
 	var ini=function(){
+		//basispfad
+		var e=gE(zielid);
+		e.innerHTML="";
+		if(e){
+			var bpfad=parseJSON(e.getAttribute("data-setup"));
+			if(bpfad.basispfad!=undefined){
+				gethelper=bpfad.basispfad+gethelper;
+				urlsender=bpfad.basispfad+urlsender;
+				urlepg=bpfad.basispfad+urlepg;
+				senderbilder=bpfad.basispfad+senderbilder;
+			}
+		}
+		
+		
 		new htmlloader(urlsender,parsesenderliste,function(e){console.log("ERR",e);});
 		
 		initButtons();

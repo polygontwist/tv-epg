@@ -10,18 +10,20 @@ header("Content-Type: text/xml; charset=utf-8");
 date_default_timezone_set('Europe/Dublin');
 
 $url=@$_GET['url'];
+$reload=stripos(@$_GET['reload'],'true')===0;
+
 
 $cacheurl= explode("sRef=",$url)[1]; 				//1:0:19:2B5C:41B:1:FFFF014A:0:0:0:
 $cacheurl=$cache.implode("_", explode(":",$cacheurl) ).".xml"; 	//1_0_19_2B5C_41B_1_FFFF014A_0_0_0_
 
 $getfromcache=false;
  
-if(file_exists($cacheurl)){ 
+if(file_exists($cacheurl) && !$reload){ 
 	 //check alter
 	 $dateitime= filectime($cacheurl);	//int
 	 $jetzt = strtotime("-0 days");		//int
 	 $alter=floor( (date("U", $jetzt)-date("U", $dateitime)) /60);//min	 
-	 if($alter<60*24){
+	 if($alter<60*10){
 		 //aus chache
 		 $getfromcache=true;
 		 
