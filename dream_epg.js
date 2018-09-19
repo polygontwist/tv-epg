@@ -256,8 +256,8 @@ var dream_epg=function(){
 		return false;
 	}
 	var addNullen=function(zahl,anzahl){
-		var re=""+zahl,i,rel=re.length;
-		for(i=0;i<anzahl-rel;i++){
+		var re=""+zahl;
+		while(re.length<anzahl){
 			re="0"+re;
 		}
 		return re;
@@ -308,8 +308,9 @@ var dream_epg=function(){
 	
 	var ismaker=function(data){
 		var i,m,re=false,
-			sender=data.e2eventservicename,
-			titel=data.e2eventtitle;
+			sender=data.e2eventservicename+'',
+			titel=data.e2eventtitle+'';
+		
 		//todo: data.e2eventdescription if !=undefined
 		if(titel==undefined)return re;
 		
@@ -546,11 +547,11 @@ var dream_epg=function(){
 			e.preventDefault();
 		}
 		
-		var createHTML=function(data,ziel){
+		var createHTML=function(data,ziel,optclass){
 			var  time=data.starttime,//alles
 				 dtime=time.pdate,//date-object
 				 zeigetime=new Date(dtime),
-				 li,n,sp,
+				 li,n,sp,s,
 				 heute=new Date(),
 				 zeitdiff=heute.getHours()-heute.getUTCHours();
 			
@@ -559,12 +560,21 @@ var dream_epg=function(){
 			
 			li=cE(ziel,"li");
 			n=cE(li,"h4");
+			s=""
 			
-			n.innerHTML=""+
-				addNullen(zeigetime.getHours(),2)
+			if(optclass!=""){
+				s+=	"<b>"+
+					addNullen(zeigetime.getDate(),2)
+					+"."+
+					addNullen(zeigetime.getMonth()+1,2)
+					+".</b> ";
+			}			
+			s+= addNullen(zeigetime.getHours(),2)
 				+":"+
 				addNullen(zeigetime.getMinutes(),2)
 				+" ";
+			n.innerHTML=s;
+				
 			sp=cE(n,"span");
 			sp.innerHTML=data.e2eventtitle;//
 				
@@ -663,14 +673,26 @@ var dream_epg=function(){
 			var anz=sendungen.length;
 			var isadd=false;
 			var anzahlsichtbar=0;
+			var stundealt=0,teststunde,optclass;
+			
 			for(i=0;i<anz;i++){//
 				o=sendungen[i];
 				o.starttime=UnixzeitToUTC(o.e2eventstart);
 				o.node=undefined;
-				
+				optclass="";
 				time=o.starttime;//alles
 				dtime=time.pdate;//date-object
+				teststunde=time.pStunde+zeitdiff;
+				while(teststunde>23)teststunde-=24;
 				
+				if(i>0){
+					if(stundealt>teststunde){
+						//neuer Tag
+						optclass="newday";
+					}
+				}
+				stundealt=time.pStunde+zeitdiff;
+				while(stundealt>23)stundealt-=24;
 				
 				if(
 					dtime.getTime()>=(heute.getTime() - zeitdiff*60*60*1000)  //jetzt 
@@ -685,14 +707,15 @@ var dream_epg=function(){
 						subClass(li,"ausgeblendet");
 					}
 										
-					li=createHTML(o,ul);
+					li=createHTML(o,ul,optclass);
 					isadd=true;
 					anzahlsichtbar++;
 				}
 				else{
-					li=createHTML(o,ul);
+					li=createHTML(o,ul,optclass);
 					addClass(li,"ausgeblendet");
 				}
+				if(optclass!="")addClass(li,optclass);
 				
 			}
 			if(sendungen.length<10 || anzahlsichtbar<3){
@@ -770,7 +793,7 @@ var dream_epg=function(){
 	var createHTMLliste=function(){
 		var i,o,table,tr,td,th,a;
 		var ziel=gE(zielid);
-		if(ziel==undefined){console.log("keit ziel gefunden",zielid);return;}
+		if(ziel==undefined){console.log("kein Ziel gefunden",zielid);return;}
 		
 		
 		table=cE(ziel,"table");
@@ -798,9 +821,6 @@ var dream_epg=function(){
 			ziel.innerHTML="no data";
 		}
 		
-		//1x 41.86sec
-		//2x 45.92sec
-		//loadepegdata();
 		loadepegdata();
 		zeitchecker();
 	}

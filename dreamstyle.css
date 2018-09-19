@@ -81,10 +81,24 @@
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#4b4b4b',  endColorstr='#71ac00');	
 }
 
+#epgcontainer td li.newday{
+	border-left:3px solid #dddddd;
+	padding-left: 20px;
+}
+
 
 #epgcontainer td li h4{
 	margin:0;
 	font-weight:normal;
+	position:relative;
+}
+#epgcontainer td li b{
+	transform: rotate(-90deg);
+	display: inline-block;
+	transform-origin: left bottom;
+	left: -3px;
+	top: 20px;
+	position: absolute;
 }
 
 #epgcontainer td li p{
