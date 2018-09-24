@@ -609,37 +609,27 @@ var dream_epg=function(){
 			return li;
 		}
 		
-		var zeitchecken=function(){
-			var i,o,dtime;
-			//TODO: +alternativzeit
-			//checken ob nodes ausgeblendet werden sollen
-			//console.log("checktime",senderdata.e2servicename,sendungen);
-			
+		var sendungvorbei=function(sendung){
 			var jetzt=getJetzt();
-			var zeitdiff=jetzt.getHours()-jetzt.getUTCHours();
+			return ( 0>sendung.e2eventduration*1000  + sendung.e2eventstart*1000 - jetzt.getTime());
+		}
+		
+		var zeitchecken=function(){
+			var i,o;
 			var isset=false;
 			for(i=0;i<sendungen.length;i++){
-				o=sendungen[i];
-				//o.starttime.pdate
-				dtime=o.starttime.pdate;//date-object
-					
+				o=sendungen[i];					
 				if(
-					dtime.getTime()>(jetzt.getTime() - zeitdiff*60*60*1000)  //jetzt 
-					&&
-					dtime.getTime()<(jetzt.getTime()+(24+zeitdiff)*60*60*1000) //jetzt +24h
-					
+					!sendungvorbei(o)
 					||i==(sendungen.length-1)
 				){
 					subClass(o.node,"ausgeblendet");
-					if(!isset && i>0 && i!=(sendungen.length-1))subClass(sendungen[i-1].node,"ausgeblendet");
 					isset=true;
 				}
 				else{
-					
 					addClass(o.node,"ausgeblendet");
 				}
 			}
-			
 		}
 		
 		//api
@@ -648,7 +638,7 @@ var dream_epg=function(){
 		}
 		
 		var parser=function(data){
-			var i,liste,n,o,ul,li, zeit,titel,beschr,time,dtime,zeigetime;
+			var i,liste,n,o,ul,li, time,dtime;
 			node.innerHTML="";			
 			var heute=new Date(),
 				zeitdiff=heute.getHours()-heute.getUTCHours();
@@ -665,7 +655,6 @@ var dream_epg=function(){
 					else{
 						console.log(o.e2eventservicereference);
 					}
-					//if(i==0)console.log(sendungen[0]);
 				}
 			}
 			
@@ -695,18 +684,10 @@ var dream_epg=function(){
 				while(stundealt>23)stundealt-=24;
 				
 				if(
-					dtime.getTime()>=(heute.getTime() - zeitdiff*60*60*1000)  //jetzt 
-					&&
-					dtime.getTime()<(heute.getTime()+(48+zeitdiff)*60*60*1000) //jetzt +24h
-					
+					!sendungvorbei(o)
 					||i==anz-1
 				)
 				{
-					if(!isadd && i>0 && i!=(anz-1)){//aktuelleSendung
-						li=sendungen[i-1].node;
-						subClass(li,"ausgeblendet");
-					}
-										
 					li=createHTML(o,ul,optclass);
 					isadd=true;
 					anzahlsichtbar++;
@@ -720,22 +701,21 @@ var dream_epg=function(){
 			}
 			if(sendungen.length<10 || anzahlsichtbar<3){
 				if(sendungen.length<1){
-						node.innerHTML="keine Sendungen gefunden";
-						n=cE(node,"a");
+						node.innerHTML="";
+						n=cE(node,"span",undefined,"keinesendung");
+						n.innerHTML="keine Sendungen gefunden";
 						
+						n=cE(node,"a");
 					}
 					else{
 						li=cE(ul,"li");
 						addClass(li,"hgtrans");
 						n=cE(li,"a");
 					}
-				
-				
 				n.innerHTML="reload";
 				n.href="#";
 				n.className="buttreload";
 				n.addEventListener("click",reloaddata);
-				
 			}
 			else
 				senderdata.sendungen=sendungen;
