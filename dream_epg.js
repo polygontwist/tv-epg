@@ -611,7 +611,7 @@ var dream_epg=function(){
 		
 		var sendungvorbei=function(sendung){
 			var jetzt=getJetzt();
-			return ( 0>sendung.e2eventduration*1000  + sendung.e2eventstart*1000 - jetzt.getTime());
+			return ( 0>(sendung.e2eventduration-1)*1000  + sendung.e2eventstart*1000 - jetzt.getTime());
 		}
 		
 		var zeitchecken=function(){
