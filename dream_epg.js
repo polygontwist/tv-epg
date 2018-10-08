@@ -64,6 +64,7 @@ var dream_epg=function(){
 		{"m":"Class","s":"one"},
 		{"m":"Marvel's","s":"syfy"},
 		{"m":"Supernatural","s":"prosiebenmaxx"},
+		
 		{"m":"Legion","s":"fox"},
 		{"m":"The Big Bang Theory","s":"prosieben"},
 		{"m":"Young Sheldon","s":"prosieben"},
@@ -313,13 +314,14 @@ var dream_epg=function(){
 		
 		//todo: data.e2eventdescription if !=undefined
 		if(titel==undefined)return re;
+		sender=sender.split(" ").join("").toLowerCase();
 		
 		for(i=0;i<makerliste.length;i++){
 			m=makerliste[i];
 			if(titel.toLowerCase().indexOf(m.m.toLowerCase())>-1){
 				re=true;
 				if(m.s!=undefined){
-					if(sender.toLowerCase().indexOf(m.s.toLowerCase())<0){
+					if(sender.indexOf(m.s.toLowerCase())<0){
 						re=false;
 					}
 				}
