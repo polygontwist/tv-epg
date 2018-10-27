@@ -59,6 +59,7 @@ var dream_epg=function(){
 		{"m":"Expanse"},
 		{"m":"Zärtlichkeiten im Bus"},
 		{"m":"Game of Thrones"},
+		{"m":"Krypton","s":"syfy"},
 		{"m":"Incorporated","s":"syfy"},
 		{"m":"Doctor Who","s":"fox"},
 		{"m":"Class","s":"one"},

@@ -1,3 +1,6 @@
+#epgcontainer{
+	margin-top:5px;
+}
 #epgcontainer *{
 	box-sizing: border-box;
 }
@@ -134,7 +137,7 @@
     border:1px solid #444444;
 	color: #e2e2e2 !important;
 	margin:0 !important;
-	
+	line-height: 25px;
 	background-color:#fff;
 	display: inline-block;
 	height:25px;         
